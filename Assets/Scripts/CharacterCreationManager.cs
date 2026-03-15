@@ -5,150 +5,257 @@ using TMPro;
 
 public class CharacterCreationManager : MonoBehaviour
 {
-    [Header("Characters")]
+    [Header("3D Characters")]
     public GameObject maleCharacter;
     public GameObject femaleCharacter;
 
-    [Header("Gender")]
+    [Header("Gender Dropdown")]
     public TMP_Dropdown genderDropdown;
 
-    [Header("Clothing Arrays - Male")]
-    public GameObject[] maleAccessories;
+    [Header("Male Clothing")]
+    public GameObject[] maleHelmets;
+    public GameObject[] maleGloves;
     public GameObject[] maleTops;
     public GameObject[] malePants;
-    public GameObject[] maleHair;
+    public GameObject[] maleBoots;
+    public GameObject[] maleNecklaces;
 
-    [Header("Clothing Arrays - Female")]
-    public GameObject[] femaleAccessories;
+    [Header("Female Clothing")]
+    public GameObject[] femaleHelmets;
+    public GameObject[] femaleGloves;
     public GameObject[] femaleTops;
-    public GameObject[] femaleSkirts;
-    public GameObject[] femaleHair;
+    public GameObject[] femalePants;
+    public GameObject[] femaleBoots;
+    public GameObject[] femaleNecklaces;
 
     [Header("Arrow Buttons")]
-    public Button accessoriesLeft, accessoriesRight;
-    public Button topsLeft, topsRight;
-    public Button pantsLeft, pantsRight;
-    public Button hairLeft, hairRight;
+    public Button leftArrow;
+    public Button rightArrow;
 
-    [Header("Item Display Images")]
-    public Image accessoryDisplay;
-    public Image topsDisplay;
-    public Image pantsDisplay;
-    public Image hairDisplay;
+    [Header("Category Toggles")]
+    public Toggle helmetToggle;
+    public Toggle gloveToggle;
+    public Toggle topToggle;
+    public Toggle pantToggle;
+    public Toggle bootToggle;
+    public Toggle necklaceToggle;
 
-    [Header("Buttons")]
-    public Button resetButton;
-    public Button finishButton;
-    public Button quitButton;
+    [Header("Clothing Grid")]
+    public ClothingGridDisplay clothingGrid;
 
-    private int accIndex = 0, topIndex = 0, pantIndex = 0, hairIndex = 0;
+    [Header("Sliders")]
+    public Slider heightSlider;
+    public Slider widthSlider;
+
+    [Header("Scale Ranges")]
+    public float minHeight = 0.85f, maxHeight = 1.15f;
+    public float minWidth  = 0.85f, maxWidth  = 1.15f;
+
+    [Header("Navigation Buttons")]
+    public Button backButton;
+    public Button continueButton;
+
+    public enum ClothingCategory { None, Helmet, Glove, Top, Pant, Boot, Necklace }
+    private ClothingCategory activeCategory = ClothingCategory.None;
+
+    private int helmetIdx, gloveIdx, topIdx, pantIdx, bootIdx, necklaceIdx;
     private bool isMale = true;
 
-    private GameObject currentAcc, currentTop, currentPant, currentHair;
+    private GameObject currentHelmet, currentGlove, currentTop,
+                       currentPant,   currentBoot,  currentNecklace;
 
     void Start()
     {
-        // gender dropdown
         genderDropdown.onValueChanged.AddListener(OnGenderChanged);
 
-        // arrow buttons
-        accessoriesLeft.onClick.AddListener(() => CycleItem(ref accIndex, GetAccessories(), -1, ref currentAcc));
-        accessoriesRight.onClick.AddListener(() => CycleItem(ref accIndex, GetAccessories(), 1, ref currentAcc));
-        topsLeft.onClick.AddListener(() => CycleItem(ref topIndex, GetTops(), -1, ref currentTop));
-        topsRight.onClick.AddListener(() => CycleItem(ref topIndex, GetTops(), 1, ref currentTop));
-        pantsLeft.onClick.AddListener(() => CycleItem(ref pantIndex, GetPants(), -1, ref currentPant));
-        pantsRight.onClick.AddListener(() => CycleItem(ref pantIndex, GetPants(), 1, ref currentPant));
-        hairLeft.onClick.AddListener(() => CycleItem(ref hairIndex, GetHair(), -1, ref currentHair));
-        hairRight.onClick.AddListener(() => CycleItem(ref hairIndex, GetHair(), 1, ref currentHair));
+        leftArrow .onClick.AddListener(() => CycleActiveCategory(-1));
+        rightArrow.onClick.AddListener(() => CycleActiveCategory(+1));
 
-        resetButton.onClick.AddListener(ResetCharacter);
-        finishButton.onClick.AddListener(OnFinish);
-        quitButton.onClick.AddListener(OnQuit);
+        helmetToggle  .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Helmet);   });
+        gloveToggle   .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Glove);    });
+        topToggle     .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Top);      });
+        pantToggle    .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Pant);     });
+        bootToggle    .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Boot);     });
+        necklaceToggle.onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Necklace); });
+
+        heightSlider.onValueChanged.AddListener(_ => ApplyScale());
+        widthSlider .onValueChanged.AddListener(_ => ApplyScale());
+
+        backButton    .onClick.AddListener(OnBack);
+        continueButton.onClick.AddListener(OnContinue);
 
         SetGender(true);
     }
 
+    void SetActiveCategory(ClothingCategory category)
+    {
+    activeCategory = category;
+    leftArrow .interactable = true;
+    rightArrow.interactable = true;
+    clothingGrid.LoadCategory(GetCategoryData(category));
+    }
+    
+    GameObject[] GetCategoryData(ClothingCategory category)
+    { switch (category)
+    {
+        case ClothingCategory.Helmet:   return isMale ? maleHelmets   : femaleHelmets;
+        case ClothingCategory.Glove:    return isMale ? maleGloves    : femaleGloves;
+        case ClothingCategory.Top:      return isMale ? maleTops      : femaleTops;
+        case ClothingCategory.Pant:     return isMale ? malePants     : femalePants;
+        case ClothingCategory.Boot:     return isMale ? maleBoots     : femaleBoots;
+        case ClothingCategory.Necklace: return isMale ? maleNecklaces : femaleNecklaces;
+        default:                        return null;
+    }
+    }
+
+    void CycleActiveCategory(int dir)
+    {
+        clothingGrid.TurnPage(dir);
+    }
+
+    public void EquipFromGrid(GameObject item)
+    {
+        GameObject[] pool = isMale ? GetMalePool(activeCategory)
+                                : GetFemalePool(activeCategory);
+        HideAll(pool);
+
+        if (item != null)
+            item.SetActive(true);
+    }
+
+    GameObject[] GetMalePool(ClothingCategory category)
+    {
+        switch (category)
+        {
+            case ClothingCategory.Helmet:   return maleHelmets;
+            case ClothingCategory.Glove:    return maleGloves;
+            case ClothingCategory.Top:      return maleTops;
+            case ClothingCategory.Pant:     return malePants;
+            case ClothingCategory.Boot:     return maleBoots;
+            case ClothingCategory.Necklace: return maleNecklaces;
+            default:                        return null;
+        }
+    }
+
+    GameObject[] GetFemalePool(ClothingCategory category)
+    {
+        switch (category)
+        {
+            case ClothingCategory.Helmet:   return femaleHelmets;
+            case ClothingCategory.Glove:    return femaleGloves;
+            case ClothingCategory.Top:      return femaleTops;
+            case ClothingCategory.Pant:     return femalePants;
+            case ClothingCategory.Boot:     return femaleBoots;
+            case ClothingCategory.Necklace: return femaleNecklaces;
+            default:                        return null;
+        }
+    }
+
     void OnGenderChanged(int value)
     {
-        // 0 = female, 1 = male
-        SetGender(value == 1);
+        SetGender(value == 0);
     }
 
     void SetGender(bool male)
     {
         isMale = male;
-        maleCharacter.SetActive(male);
+        maleCharacter  .SetActive(male);
         femaleCharacter.SetActive(!male);
-        ResetCharacter();
+        ResetAllClothing();
+
+        helmetIdx = gloveIdx = topIdx = pantIdx = bootIdx = necklaceIdx = 0;
+        currentHelmet = currentGlove = currentTop =
+        currentPant   = currentBoot  = currentNecklace = null;
+
+        activeCategory = ClothingCategory.None;
+
+        helmetToggle  .SetIsOnWithoutNotify(false);
+        gloveToggle   .SetIsOnWithoutNotify(false);
+        topToggle     .SetIsOnWithoutNotify(false);
+        pantToggle    .SetIsOnWithoutNotify(false);
+        bootToggle    .SetIsOnWithoutNotify(false);
+        necklaceToggle.SetIsOnWithoutNotify(false);
+
+        clothingGrid.Clear();
+
+        heightSlider.value = 0.5f;
+        widthSlider .value = 0.5f;
+        ApplyScale();
     }
 
-    void ResetCharacter()
+    void ApplyScale()
     {
-        // deactivate all clothing
-        DeactivateAll(maleAccessories); DeactivateAll(femaleAccessories);
-        DeactivateAll(maleTops);        DeactivateAll(femaleTops);
-        DeactivateAll(malePants);       DeactivateAll(femaleSkirts);
-        DeactivateAll(maleHair);        DeactivateAll(femaleHair);
-
-        currentAcc = null; currentTop = null;
-        currentPant = null; currentHair = null;
-        accIndex = 0; topIndex = 0;
-        pantIndex = 0; hairIndex = 0;
+        Transform root = isMale ? maleCharacter.transform : femaleCharacter.transform;
+        float h = Mathf.Lerp(minHeight, maxHeight, heightSlider.value);
+        float w = Mathf.Lerp(minWidth,  maxWidth,  widthSlider.value);
+        root.localScale = new Vector3(w, h, w);
     }
 
-    void DeactivateAll(GameObject[] items)
+    void Cycle(ref int index, GameObject[] items, int dir, ref GameObject current)
     {
+        if (items == null || items.Length == 0) return;
+
+        if (current != null)
+        {
+            current.SetActive(false);
+            current = null;
+        }
+
+        index += dir;
+        if (index < 0)            index = items.Length;
+        if (index > items.Length) index = 0;
+
+        if (index > 0 && items[index - 1] != null)
+        {
+            current = items[index - 1];
+            current.SetActive(true);
+        }
+    }
+
+    GameObject[] GetHelmets()   => isMale ? maleHelmets   : femaleHelmets;
+    GameObject[] GetGloves()    => isMale ? maleGloves    : femaleGloves;
+    GameObject[] GetTops()      => isMale ? maleTops      : femaleTops;
+    GameObject[] GetPants()     => isMale ? malePants     : femalePants;
+    GameObject[] GetBoots()     => isMale ? maleBoots     : femaleBoots;
+    GameObject[] GetNecklaces() => isMale ? maleNecklaces : femaleNecklaces;
+
+    void ResetAllClothing()
+    {
+        HideAll(maleHelmets);    HideAll(femaleHelmets);
+        HideAll(maleGloves);     HideAll(femaleGloves);
+        HideAll(maleTops);       HideAll(femaleTops);
+        HideAll(malePants);      HideAll(femalePants);
+        HideAll(maleBoots);      HideAll(femaleBoots);
+        HideAll(maleNecklaces);  HideAll(femaleNecklaces);
+    }
+
+    void HideAll(GameObject[] items)
+    {
+        if (items == null) return;
         foreach (var item in items)
             if (item != null) item.SetActive(false);
     }
 
-    void CycleItem(ref int index, GameObject[] items, int direction, ref GameObject current)
+    void OnBack()
     {
-        if (items == null || items.Length == 0) return;
-
-        if (current != null) current.SetActive(false);
-
-        //  0 = no item equipped
-        index += direction;
-        if (index < 0) index = items.Length; // 0 = none, 1-N = items
-        if (index > items.Length) index = 0;
-
-        if (index == 0)
-        {
-            current = null; // naked slot
-        }
-        else
-        {
-            current = items[index - 1];
-            if (current != null) current.SetActive(true);
-        }
+        int current = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(current - 1);
     }
 
-    // return correct gender array
-    GameObject[] GetAccessories() => isMale ? maleAccessories : femaleAccessories;
-    GameObject[] GetTops()        => isMale ? maleTops : femaleTops;
-    GameObject[] GetPants()       => isMale ? malePants : femaleSkirts;
-    GameObject[] GetHair()        => isMale ? maleHair : femaleHair;
-
-    void OnFinish()
+    void OnContinue()
     {
-        // save selections for review screen
-        PlayerPrefs.SetString("Gender", isMale ? "Male" : "Female");
-        PlayerPrefs.SetInt("AccIndex", accIndex);
-        PlayerPrefs.SetInt("TopIndex", topIndex);
-        PlayerPrefs.SetInt("PantIndex", pantIndex);
-        PlayerPrefs.SetInt("HairIndex", hairIndex);
+        PlayerPrefs.SetString("Gender",      isMale ? "Male" : "Female");
+        PlayerPrefs.SetInt   ("HelmetIdx",   helmetIdx);
+        PlayerPrefs.SetInt   ("GloveIdx",    gloveIdx);
+        PlayerPrefs.SetInt   ("TopIdx",      topIdx);
+        PlayerPrefs.SetInt   ("PantIdx",     pantIdx);
+        PlayerPrefs.SetInt   ("BootIdx",     bootIdx);
+        PlayerPrefs.SetInt   ("NecklaceIdx", necklaceIdx);
+        PlayerPrefs.SetFloat ("Height",      heightSlider.value);
+        PlayerPrefs.SetFloat ("Width",       widthSlider.value);
         PlayerPrefs.Save();
 
-        SceneManager.LoadScene("ReviewScreen");
-    }
-
-    void OnQuit()
-    {
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
-            Application.Quit();
-        #endif
+        int current = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(current + 1);
     }
 }
