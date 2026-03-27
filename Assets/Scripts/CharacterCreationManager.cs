@@ -28,6 +28,7 @@ public class CharacterCreationManager : MonoBehaviour
     public GameObject[] femaleBoots;
     public GameObject[] femaleNecklaces;
 
+
     [Header("Arrow Buttons")]
     public Button leftArrow;
     public Button rightArrow;
@@ -40,8 +41,17 @@ public class CharacterCreationManager : MonoBehaviour
     public Toggle bootToggle;
     public Toggle necklaceToggle;
 
+
     [Header("Clothing Grid")]
     public ClothingGridDisplay clothingGrid;
+
+    [Header("Clothing Data")]
+    public ClothingItemData[] helmetData;
+    public ClothingItemData[] gloveData;
+    public ClothingItemData[] topData;
+    public ClothingItemData[] pantData;
+    public ClothingItemData[] bootData;
+    public ClothingItemData[] necklaceData;
 
     [Header("Sliders")]
     public Slider heightSlider;
@@ -94,34 +104,46 @@ public class CharacterCreationManager : MonoBehaviour
     rightArrow.interactable = true;
     clothingGrid.LoadCategory(GetCategoryData(category));
     }
-    
-    GameObject[] GetCategoryData(ClothingCategory category)
-    { switch (category)
-    {
-        case ClothingCategory.Helmet:   return isMale ? maleHelmets   : femaleHelmets;
-        case ClothingCategory.Glove:    return isMale ? maleGloves    : femaleGloves;
-        case ClothingCategory.Top:      return isMale ? maleTops      : femaleTops;
-        case ClothingCategory.Pant:     return isMale ? malePants     : femalePants;
-        case ClothingCategory.Boot:     return isMale ? maleBoots     : femaleBoots;
-        case ClothingCategory.Necklace: return isMale ? maleNecklaces : femaleNecklaces;
-        default:                        return null;
-    }
-    }
 
     void CycleActiveCategory(int dir)
     {
         clothingGrid.TurnPage(dir);
     }
 
-    public void EquipFromGrid(GameObject item)
+
+    ClothingItemData[] GetCategoryData(ClothingCategory category)
+    {
+        switch (category)
+        {
+            case ClothingCategory.Helmet:   return helmetData;
+            case ClothingCategory.Glove:    return gloveData;
+            case ClothingCategory.Top:      return topData;
+            case ClothingCategory.Pant:     return pantData;
+            case ClothingCategory.Boot:     return bootData;
+            case ClothingCategory.Necklace: return necklaceData;
+            default:                        return null;
+        }
+    }
+
+
+    public void EquipByName(string meshName)
     {
         GameObject[] pool = isMale ? GetMalePool(activeCategory)
-                                : GetFemalePool(activeCategory);
+                                   : GetFemalePool(activeCategory);
         HideAll(pool);
 
-        if (item != null)
-            item.SetActive(true);
+        if (pool == null) return;
+
+        foreach (GameObject item in pool)
+        {
+            if (item != null && item.name == meshName)
+            {
+                item.SetActive(true);
+                break;
+            }
+        }
     }
+
 
     GameObject[] GetMalePool(ClothingCategory category)
     {
