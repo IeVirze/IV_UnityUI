@@ -9,8 +9,11 @@ public class UISoundManager : MonoBehaviour
     public AudioSource audioSource;
 
     [Header("Sounds")]
-    public AudioClip buttonClick;
-    public AudioClip buttonHover;
+    public AudioClip clickSound;
+    public AudioClip hoverSound;
+    public AudioClip toggleSound;
+    public AudioClip dropdownSound;
+    public AudioClip inputFieldSound;
 
     void Awake()
     {
@@ -27,16 +30,17 @@ public class UISoundManager : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
     }
 
-    public void PlayClick()
-    {
-        if (buttonClick != null)
-            audioSource.PlayOneShot(buttonClick);
-    }
 
-    public void PlayHover()
+    public void PlayClick()      => PlaySound(clickSound);
+    public void PlayHover()      => PlaySound(hoverSound);
+    public void PlayToggle()     => PlaySound(toggleSound);
+    public void PlayDropdown()   => PlaySound(dropdownSound);
+    public void PlayInputField() => PlaySound(inputFieldSound);
+
+    void PlaySound(AudioClip clip)
     {
-        if (buttonHover != null)
-            audioSource.PlayOneShot(buttonHover);
+        if (clip == null || audioSource == null) return;
+        audioSource.PlayOneShot(clip);
     }
 }
 
