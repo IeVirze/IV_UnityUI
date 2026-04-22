@@ -3,6 +3,7 @@
 Skills gained: 
 * Basic knowledge of working with various Unity assets
 * Understanding of 3D sprites and how to add them in 2D scene
+* Knowledge of shaders, the importance, modification and working princpiles for 3D characters
 * Screen connection
 * Better debugging
 * Skills of working with C#
