@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class ClothingGridDisplay : MonoBehaviour
 {
@@ -18,8 +17,11 @@ public class ClothingGridDisplay : MonoBehaviour
     {
         for (int i = 0; i < PAGE_SIZE; i++)
         {
-            if (slotImages  != null && i < slotImages.Length  && slotImages[i]  != null)
+            if (slotImages != null && i < slotImages.Length && slotImages[i] != null)
+            {
                 slotImages[i].enabled = false;
+                slotImages[i].raycastTarget = false; // IMAGE MUST NOT BLOCK THE BUTTON
+            }
 
             if (slotButtons != null && i < slotButtons.Length && slotButtons[i] != null)
                 slotButtons[i].interactable = false;
@@ -46,29 +48,26 @@ public class ClothingGridDisplay : MonoBehaviour
         for (int i = 0; i < PAGE_SIZE; i++)
         {
             int dataIndex = page * PAGE_SIZE + i;
-            bool hasItem  = currentItems != null && dataIndex < currentItems.Length;
+            bool hasItem = currentItems != null && dataIndex < currentItems.Length;
 
-            if (slotImages  != null && i < slotImages.Length  && slotImages[i]  != null)
+            if (slotImages != null && i < slotImages.Length && slotImages[i] != null)
+            {
+                slotImages[i].raycastTarget = false; // always off - button handles clicks
                 slotImages[i].enabled = hasItem;
+                slotImages[i].sprite = hasItem ? currentItems[dataIndex].previewSprite : null;
+                if (hasItem) slotImages[i].preserveAspect = true;
+            }
 
             if (slotButtons != null && i < slotButtons.Length && slotButtons[i] != null)
             {
                 slotButtons[i].interactable = hasItem;
                 slotButtons[i].onClick.RemoveAllListeners();
-            }
 
-            if (hasItem)
-            {
-                ClothingItemData data     = currentItems[dataIndex];
-                slotImages[i].sprite      = data.previewSprite;
-                slotImages[i].preserveAspect = true;
-
-                int captured = dataIndex;
-                slotButtons[i].onClick.AddListener(() => OnItemClicked(captured));
-            }
-            else
-            {
-                if (slotImages[i] != null) slotImages[i].sprite = null;
+                if (hasItem)
+                {
+                    int captured = dataIndex;
+                    slotButtons[i].onClick.AddListener(() => OnItemClicked(captured));
+                }
             }
         }
     }
@@ -86,10 +85,10 @@ public class ClothingGridDisplay : MonoBehaviour
 
         for (int i = 0; i < PAGE_SIZE; i++)
         {
-            if (slotImages  != null && i < slotImages.Length  && slotImages[i]  != null)
+            if (slotImages != null && i < slotImages.Length && slotImages[i] != null)
             {
                 slotImages[i].enabled = false;
-                slotImages[i].sprite  = null;
+                slotImages[i].sprite = null;
             }
 
             if (slotButtons != null && i < slotButtons.Length && slotButtons[i] != null)
