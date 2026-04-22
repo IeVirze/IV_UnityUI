@@ -617,8 +617,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UISoundManager
   audioSource: {fileID: 0}
-  buttonClick: {fileID: 8300000, guid: 2c5292ba5cf254919a6b9e2b18e04f49, type: 3}
-  buttonHover: {fileID: 8300000, guid: b6428d4edb06344ba829da4edd9967c1, type: 3}
+  clickSound: {fileID: 8300000, guid: 2c5292ba5cf254919a6b9e2b18e04f49, type: 3}
+  hoverSound: {fileID: 8300000, guid: 7478151cf36724a7dada558f746c3633, type: 3}
+  toggleSound: {fileID: 8300000, guid: 0994c12e202f342459a4212e7287f7e8, type: 3}
+  dropdownSound: {fileID: 8300000, guid: ff5f85da24bc943d1abdc5760a22bc81, type: 3}
+  inputFieldSound: {fileID: 8300000, guid: 4e1ff8faed12a475eba9be0e46072269, type: 3}
 --- !u!1 &179589047
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,6 +792,7 @@ GameObject:
   - component: {fileID: 203213217}
   - component: {fileID: 203213216}
   - component: {fileID: 203213215}
+  - component: {fileID: 203213218}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -898,6 +902,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203213213}
   m_CullTransparentMesh: 1
+--- !u!114 &203213218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203213213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07724a4f3b9d1c149b28025139bc083d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSound
 --- !u!1 &271987455
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,6 +926,7 @@ GameObject:
   - component: {fileID: 271987459}
   - component: {fileID: 271987458}
   - component: {fileID: 271987457}
+  - component: {fileID: 271987460}
   m_Layer: 5
   m_Name: NameInput
   m_TagString: Untagged
@@ -1076,6 +1093,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 271987455}
   m_CullTransparentMesh: 1
+--- !u!114 &271987460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271987455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28dbccbdd3ff6b342b6c43532741eb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InputFieldSound
 --- !u!1 &329377215
 GameObject:
   m_ObjectHideFlags: 0
@@ -1710,6 +1739,7 @@ GameObject:
   - component: {fileID: 831271068}
   - component: {fileID: 831271067}
   - component: {fileID: 831271066}
+  - component: {fileID: 831271069}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -1819,6 +1849,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 831271064}
   m_CullTransparentMesh: 1
+--- !u!114 &831271069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831271064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07724a4f3b9d1c149b28025139bc083d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSound
 --- !u!1 &838041876
 GameObject:
   m_ObjectHideFlags: 0
@@ -2881,6 +2923,7 @@ GameObject:
   - component: {fileID: 2095049081}
   - component: {fileID: 2095049080}
   - component: {fileID: 2095049079}
+  - component: {fileID: 2095049082}
   m_Layer: 5
   m_Name: AgeInput
   m_TagString: Untagged
@@ -3047,6 +3090,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2095049077}
   m_CullTransparentMesh: 1
+--- !u!114 &2095049082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095049077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28dbccbdd3ff6b342b6c43532741eb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InputFieldSound
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
