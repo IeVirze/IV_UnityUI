@@ -28,11 +28,6 @@ public class CharacterCreationManager : MonoBehaviour
     public GameObject[] femaleBoots;
     public GameObject[] femaleNecklaces;
 
-
-    [Header("Arrow Buttons")]
-    public Button leftArrow;
-    public Button rightArrow;
-
     [Header("Category Toggles")]
     public Toggle helmetToggle;
     public Toggle gloveToggle;
@@ -78,20 +73,17 @@ public class CharacterCreationManager : MonoBehaviour
     {
         genderDropdown.onValueChanged.AddListener(OnGenderChanged);
 
-        leftArrow .onClick.AddListener(() => CycleActiveCategory(-1));
-        rightArrow.onClick.AddListener(() => CycleActiveCategory(+1));
-
-        helmetToggle  .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Helmet);   });
-        gloveToggle   .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Glove);    });
-        topToggle     .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Top);      });
-        pantToggle    .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Pant);     });
-        bootToggle    .onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Boot);     });
+        helmetToggle.onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Helmet);   });
+        gloveToggle.onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Glove);    });
+        topToggle.onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Top);      });
+        pantToggle.onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Pant);     });
+        bootToggle.onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Boot);     });
         necklaceToggle.onValueChanged.AddListener(isOn => { if (isOn) SetActiveCategory(ClothingCategory.Necklace); });
 
         heightSlider.onValueChanged.AddListener(_ => ApplyScale());
-        widthSlider .onValueChanged.AddListener(_ => ApplyScale());
+        widthSlider.onValueChanged.AddListener(_ => ApplyScale());
 
-        backButton    .onClick.AddListener(OnBack);
+        backButton.onClick.AddListener(OnBack);
         continueButton.onClick.AddListener(OnContinue);
 
         SetGender(true);
@@ -100,14 +92,7 @@ public class CharacterCreationManager : MonoBehaviour
     void SetActiveCategory(ClothingCategory category)
     {
     activeCategory = category;
-    leftArrow .interactable = true;
-    rightArrow.interactable = true;
     clothingGrid.LoadCategory(GetCategoryData(category));
-    }
-
-    void CycleActiveCategory(int dir)
-    {
-        clothingGrid.TurnPage(dir);
     }
 
 
@@ -129,11 +114,9 @@ public class CharacterCreationManager : MonoBehaviour
     public void EquipByName(string meshName)
     {
         GameObject[] pool = isMale ? GetMalePool(activeCategory)
-                                   : GetFemalePool(activeCategory);
+                                : GetFemalePool(activeCategory);
+        if (pool == null) return;  
         HideAll(pool);
-
-        if (pool == null) return;
-
         foreach (GameObject item in pool)
         {
             if (item != null && item.name == meshName)
@@ -213,27 +196,6 @@ public class CharacterCreationManager : MonoBehaviour
         root.localScale = new Vector3(w, h, w);
     }
 
-    void Cycle(ref int index, GameObject[] items, int dir, ref GameObject current)
-    {
-        if (items == null || items.Length == 0) return;
-
-        if (current != null)
-        {
-            current.SetActive(false);
-            current = null;
-        }
-
-        index += dir;
-        if (index < 0)            index = items.Length;
-        if (index > items.Length) index = 0;
-
-        if (index > 0 && items[index - 1] != null)
-        {
-            current = items[index - 1];
-            current.SetActive(true);
-        }
-    }
-
     GameObject[] GetHelmets()   => isMale ? maleHelmets   : femaleHelmets;
     GameObject[] GetGloves()    => isMale ? maleGloves    : femaleGloves;
     GameObject[] GetTops()      => isMale ? maleTops      : femaleTops;
@@ -260,21 +222,12 @@ public class CharacterCreationManager : MonoBehaviour
 
     void OnBack()
     {
-        int current = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(current - 1);
+            Application.Quit();
     }
 
     void OnContinue()
     {
         PlayerPrefs.SetString("Gender",      isMale ? "Male" : "Female");
-        PlayerPrefs.SetInt   ("HelmetIdx",   helmetIdx);
-        PlayerPrefs.SetInt   ("GloveIdx",    gloveIdx);
-        PlayerPrefs.SetInt   ("TopIdx",      topIdx);
-        PlayerPrefs.SetInt   ("PantIdx",     pantIdx);
-        PlayerPrefs.SetInt   ("BootIdx",     bootIdx);
-        PlayerPrefs.SetInt   ("NecklaceIdx", necklaceIdx);
-        PlayerPrefs.SetFloat ("Height",      heightSlider.value);
-        PlayerPrefs.SetFloat ("Width",       widthSlider.value);
         PlayerPrefs.Save();
 
         int current = SceneManager.GetActiveScene().buildIndex;
