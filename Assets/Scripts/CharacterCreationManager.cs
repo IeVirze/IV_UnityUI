@@ -228,14 +228,6 @@ public class CharacterCreationManager : MonoBehaviour
     void OnContinue()
     {
         PlayerPrefs.SetString("Gender",      isMale ? "Male" : "Female");
-        PlayerPrefs.SetInt   ("HelmetIdx",   helmetIdx);
-        PlayerPrefs.SetInt   ("GloveIdx",    gloveIdx);
-        PlayerPrefs.SetInt   ("TopIdx",      topIdx);
-        PlayerPrefs.SetInt   ("PantIdx",     pantIdx);
-        PlayerPrefs.SetInt   ("BootIdx",     bootIdx);
-        PlayerPrefs.SetInt   ("NecklaceIdx", necklaceIdx);
-        PlayerPrefs.SetFloat ("Height",      heightSlider.value);
-        PlayerPrefs.SetFloat ("Width",       widthSlider.value);
         PlayerPrefs.Save();
 
         int current = SceneManager.GetActiveScene().buildIndex;
